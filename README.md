@@ -20,6 +20,7 @@ Choose file to save the key: /c/Users/<YOUR_WINDOWS_USERNAME>/.ssh/lbo-key
 
 ### port 2200 for acess in your machine
 # Instances -> [click in your Instances]- >> networking 
+https://lightsail.aws.amazon.com/ls/webapp/{your-local}/instances/{your-lightsail-name/networking
 - In Networking (aws panel) set another rule in firewall:
 -- Application = Custom
 -- Protocol = TCP
@@ -27,7 +28,6 @@ Choose file to save the key: /c/Users/<YOUR_WINDOWS_USERNAME>/.ssh/lbo-key
 
 ### Create a new user (in aws console)
 Thanks to CharInt: 
-https://askubuntu.com/questions/1019891/connecting-to-amazon-lightsail-ubuntu-server-using-different-ssh-port)
 - Login in aws ssh console and type the following:
 ```sh
 $ sudo adduser grader
@@ -36,28 +36,24 @@ $ sudo nano /etc/sudoers.d/grader
 ```
 - Paste in grader file the following:
 *grader ALL=(ALL:ALL) ALL*
-- CTRL+O (save), ENTER (confirm), CTRL+X (exit nano)
+- CTRL+X (exit nano), yes (save), enter (name file).
 User grader have sudo privilegies now! Let's authorize grader to do remote login. In aws ssh:
 ```sh
 $ su - grader
 $ mkdir .ssh
-$ sudo touch .ssh/authorized_keys
+$ sudo touch ~/.ssh/authorized_keys
 $ sudo nano .ssh/authorized_keys
 ```
-- Copy the public key generated on your local machine to this file
-- CTRL+O (save), ENTER (confirm), CTRL+X (exit nano)
+- Copy the public key generated on your local machine to this file c/Users/<YOUR_WINDOWS_USERNAME>/.ssh/lbo-key.pub
+- CTRL+X (exit nano), yes (save), enter (name file).
 - Again, in aws console:
 ```sh
 $ sudo chown -R  grader.grader /home/grader/.ssh
 $ sudo chmod  700 /home/grader/.ssh
-$ sudo chmod 600 /home/grader/.ssh/authorized_keys
+$ sudo chmod 644 /home/grader/.ssh/authorized_keys
 $ ls -als .ssh/
 ```
-Must print:
-```
-4 drwx------ 2 grader grader 
-4 drwxr-xr-x 4 grader grader 
-4 -rw------- 1 grader grader 
+
 ```
 Now, let's restart ssh and change its port to 2200:
 ```sh
@@ -65,16 +61,16 @@ $ sudo service ssh restart
 $ sudo nano /etc/ssh/sshd_config
 ```
 - Change *Port* to *2200*
-- CTRL+O (save), ENTER (confirm), CTRL+X (exit nano)
+- CTRL+X (exit nano), yes (save), enter (name file).
 ```sh
 $ sudo service sshd restart
 $ sudo service ssh restart
 ```
  You can login with grader from your windows machine using gitbash now:
  ```sh
-$ ssh grader@54.160.19.10 -p 2200 -i ~/.ssh/my_key
+$ ssh grader@3.80.9.86 -p 2200 -i ~/.ssh/grader-key-lbo
 ```
-Here 54.160.19.10 must be change to your Public IP. We change the usual ssh port to 2200.
+Here 3.80.9.86 must be change to your Public IP. We change the usual ssh port to 2200.
 
 ## UPDATE and UPGRADE
 Logged as grader:
@@ -89,7 +85,7 @@ Logged as grader:
 $ sudo vim /etc/ssh/sshd_config
 ```
 - Change *PermitRootLogin* to *no*
-- CTRL+O (save), ENTER (confirm), CTRL+X (exit nano)
+- CTRL+X (exit nano), yes (save), enter (name file).
 
 ## Configure FIREWALL
 Logged as grader:
@@ -104,6 +100,7 @@ $ sudo ufw enable
 Logged as grader:
  ```sh
 $ sudo dpkg-reconfigure tzdata
+Sao_paulo
 ```
 
 ## Install APACHE 2
@@ -112,23 +109,20 @@ Logged as grader:
 $ sudo apt-get install apache2
 $ sudo apt-get install libapache2-mod-wsgi-py3 python3-dev
 ```
-Enter in your navigator with *YOUR_PUBLIC_IP_ADDRESS* (Mine is 54.160.19.10) to test if apache works fine.
+Enter in your navigator with *YOUR_PUBLIC_IP_ADDRESS* (Mine is 3.80.9.86) to test if apache works fine.
 
 ## Install Python 3 requirements
 Logged as grader:
  ```sh
 $ sudo apt-get install python3-pip
 $ sudo python3 -m pip install --upgrade pip
-$ pip3 install <PYTHON PACKAGES>
+$ pip3 install <PYTHON PACKAGES> flask - sqlalchemy - psycopg2
 ```
 The necessary python packages for this project are flask, sqlalchemy and psycopg2. The last one have some problems because dependencies. To solve this:
  ```sh
 $ sudo apt-get install libpq-dev python3-dev 
 $ pip3 install psycopg2
 ```
-Thanks Muhammad Taqi: 
-https://stackoverflow.com/questions/28253681/you-need-to-install-postgresql-server-dev-x-y-for-building-a-server-side-extensi)
-
 ## Install and Config POSTGRESQL
 Logged as grader:
 ```sh
@@ -151,7 +145,7 @@ $ sudo apt-get install git
 $ cd /var/www
 $ sudo mkdir FlaskApp
 $ cd FlaskApp
-$ git clone https://github.com/leandrocl2005/restaurant_python3_udacity.git
+$ git clone https://github.com/lboortigoza/restaurant_python3_udacity-proj-3.git
 $ sudo mv ./restaurant_python3_udacity ./FlaskApp
 $ cd FlaskApp
 $ sudo nano config.py
