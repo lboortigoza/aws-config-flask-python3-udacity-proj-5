@@ -245,19 +245,19 @@ Add the following lines of code to the file to configure the virtual host.
         ServerName 3.80.9.86
         ServerAdmin leonardo.b.ortigoza@gmail.com
         ServerAlias 3.80.9.86.xip.io
-	WSGIScriptAlias / /var/www/FlaskApp/flaskapp.wsgi
-	<Directory /var/www/FlaskApp>
-		Order allow,deny
-		Allow from all
-	</Directory>
-	Alias /static /var/www/FlaskApp/static
-	<Directory /var/www/FlaskApp/static/>
-		Order allow,deny
-		Allow from all
-	</Directory>
-	ErrorLog ${APACHE_LOG_DIR}/error.log
-	LogLevel warn
-	CustomLog ${APACHE_LOG_DIR}/access.log combined
+        WSGIScriptAlias / /var/www/FlaskApp/flaskapp.wsgi
+        <Directory /var/www/FlaskApp/catalog_python3_udacity-proj-4/>
+                Order allow,deny
+                Allow from all
+        </Directory>
+        Alias /static /var/www/FlaskApp/catalog_python3_udacity-proj-4/static
+        <Directory /var/www/FlaskApp/catalog_python3_udacity-proj-4/static/>
+                Order allow,deny
+                Allow from all
+        </Directory>
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        LogLevel warn
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 ```
 
@@ -285,7 +285,7 @@ import sys
 import logging
 
 logging.basicConfig(stream=sys.stderr)
-sys.path.insert(0,"/var/www/FlaskApp")
+sys.path.insert(0,"/var/www/FlaskApp/catalog_python3_udacity-proj-4")
 
 from __init__ import app as application
 application.secret_key = 'super_secret_key'
