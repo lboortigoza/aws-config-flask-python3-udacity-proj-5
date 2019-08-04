@@ -171,9 +171,9 @@ $ sudo apt-get install git
 
 $ cd /var/www
 
-$ sudo mkdir ItemCatalog
+$ sudo mkdir FlaskApp
 
-$ cd ItemCatalog/
+$ cd FlaskApp/
 
 $ sudo git init
 # Initiate an empty git repository in the current folder
@@ -245,7 +245,7 @@ Add the following lines of code to the file to configure the virtual host.
         ServerName 3.80.9.86
         ServerAdmin leonardo.b.ortigoza@gmail.com
         ServerAlias 3.80.9.86.xip.io
-	WSGIScriptAlias / /var/www/FlaskApp/itemcatalog.wsgi
+	WSGIScriptAlias / /var/www/FlaskApp/flaskapp.wsgi
 	<Directory /var/www/FlaskApp>
 		Order allow,deny
 		Allow from all
