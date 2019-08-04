@@ -72,13 +72,6 @@ $ ssh grader@3.80.9.86 -p 2200 -i ~/.ssh/grader-key-lbo
 ```
 Here 3.80.9.86 must be change to your Public IP. We change the usual ssh port to 2200.
 
-## UPDATE and UPGRADE
-Logged as grader:
- ```sh
-$ sudo apt-get update
-$ sudo apt-get upgrade
-```
-
 ## Disable root login
 Logged as grader:
  ```sh
@@ -86,6 +79,14 @@ $ sudo vim /etc/ssh/sshd_config
 ```
 - Change *PermitRootLogin* to *no*
 - CTRL+X (exit nano), yes (save), enter (name file).
+
+## UPDATE and UPGRADE
+Logged as grader:
+ ```sh
+$ sudo apt-get update
+$ sudo apt-get upgrade
+configure grub-pc -> keep the local version currently installed
+```
 
 ## Configure FIREWALL
 Logged as grader:
@@ -100,7 +101,7 @@ $ sudo ufw enable
 Logged as grader:
  ```sh
 $ sudo dpkg-reconfigure tzdata
-Sao_paulo
+Current default time zone: 'America/Sao_Paulo'
 ```
 
 # Deploy catalog application on server
@@ -124,7 +125,7 @@ $ sudo service apache2 restart
 $ sudo apt-get install postgresql
 #to install postgresql
 
-$ sudo nano /etc/postgresql/9.3/main/pg_hba.conf
+$ sudo nano /etc/postgresql/9.5/main/pg_hba.conf
 #to check if no remote connections are allowed
 
 $ sudo su - postgres
@@ -178,7 +179,7 @@ $ cd FlaskApp/
 $ sudo git init
 # Initiate an empty git repository in the current folder
 
-$ sudo git remote add origin https://github.com/lboortigoza/catalog_python3_udacity-proj-4.git
+$ sudo git remote add origin https://github.com/lboortigoza/catalog_python3_udacity-proj-4
 # Add my project as a remote repository
 
 $ sudo git remote -v
@@ -190,7 +191,6 @@ $ sudo git pull origin master
 $ ls
 # Check if the files were downloaded successfully
 
-$ cd catalog_python3_udacity-proj-4/
 ```
 
 ### Configure the Catalog app
@@ -200,8 +200,9 @@ $ cd catalog_python3_udacity-proj-4/
 $ sudo mv project-1.py __init__.py
 ```
 2. Edit database_setup.py, lotsofmenus.py, and the now renamed __init.py__, and change all occurrences of 'sqlite:///brandsstore.db' to 'postgresql://catalog:passwd123@localhost/brandsstore', editing the files with: sudo nano 'FILE-NAME'
-
+sudo nano __init__.py
 ```python
+sudo nano __init__.py
 # engine = create_engine('sqlite:///brandsstore.db')
 #to
 create_engine('postgresql://catalog:passwd123@localhost/brandsstore')
@@ -216,6 +217,14 @@ $ sudo nano db_config.py
 
 ```shell
 $ sudo apt-get install python-pip
+$ sudo python -m pip install --upgrade pip
+$ sudo pip install flask
+$ sudo pip install SQLAlchemy
+$ sudo apt install libpq-dev python-dev
+$ sudo pip install psycopg2
+$ sudo pip install httplib2
+$ sudo pip install requests
+$ sudo pip install --upgrade oauth2client 
 $ sudo pip install -r requirements.txt
 ```
 - Then, use it to install all dependencies listed on requirements.txt
@@ -233,6 +242,10 @@ $ sudo python database_setup.py
 ```
 $ sudo python lotsofmenus.py
 ```
+```
+$ sudo nano __init__.py
+Remove threaded=False in last line
+```
 
 6. Configure Apache and Enable a New Virtual Host
 Create FlaskApp.conf to edit:
@@ -242,16 +255,16 @@ $ sudo nano /etc/apache2/sites-available/FlaskApp.conf
 Add the following lines of code to the file to configure the virtual host.
 ```
 <VirtualHost *:80>
-        ServerName 3.80.9.86
+        ServerName 3.93.33.208
         ServerAdmin leonardo.b.ortigoza@gmail.com
-        ServerAlias 3.80.9.86.xip.io
+        ServerAlias 3.93.33.208.xip.io
         WSGIScriptAlias / /var/www/FlaskApp/flaskapp.wsgi
-        <Directory /var/www/FlaskApp/catalog_python3_udacity-proj-4/>
+        <Directory /var/www/FlaskApp/>
                 Order allow,deny
                 Allow from all
         </Directory>
-        Alias /static /var/www/FlaskApp/catalog_python3_udacity-proj-4/static
-        <Directory /var/www/FlaskApp/catalog_python3_udacity-proj-4/static/>
+        Alias /static /var/www/FlaskApp/static
+        <Directory /var/www/FlaskApp/static/>
                 Order allow,deny
                 Allow from all
         </Directory>
@@ -259,6 +272,7 @@ Add the following lines of code to the file to configure the virtual host.
         LogLevel warn
         CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
+
 ```
 
 Enable the virtual host with the following command:
@@ -268,6 +282,7 @@ $ sudo a2ensite FlaskApp
 
 Activate the new configuration
 ```
+$ sudo service apache2 restart
 $ sudo service apache2 reload
 ```
 
@@ -285,10 +300,10 @@ import sys
 import logging
 
 logging.basicConfig(stream=sys.stderr)
-sys.path.insert(0,"/var/www/FlaskApp/catalog_python3_udacity-proj-4")
+sys.path.insert(0,"/var/www/FlaskApp")
 
 from __init__ import app as application
-application.secret_key = 'super_secret_key'
+application.secret_key = 'super_secret_key'_ import app as application
 ```
 
 # Logging
