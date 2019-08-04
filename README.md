@@ -6,6 +6,14 @@ This project is a requirement of Udacity fullstack nanodegree.
 
 # Step by Step Guide
 
+## Server Basic Information
+Public IP: 3.93.33.208
+
+SSH port: 2200
+
+App URL: http://3.93.33.208.xip.io
+
+
 ## Create an aws lightsail instance
 - Enter https://lightsail.aws.amazon.com/ls/webapp/home/instances
 - Choose: [Create Instance] -> [Linux] -> [Ubuntu 16.04] -> [Create Instance]
