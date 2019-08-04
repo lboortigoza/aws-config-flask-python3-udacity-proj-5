@@ -103,77 +103,155 @@ $ sudo dpkg-reconfigure tzdata
 Sao_paulo
 ```
 
-## Install APACHE 2
+# Deploy catalog application on server
+
 Logged as grader:
- ```sh
+
+### Setup Apache to serve a Python mod_wsgi application
+```
 $ sudo apt-get install apache2
-$ sudo apt-get install libapache2-mod-wsgi-py3 python3-dev
-```
-Enter in your navigator with *YOUR_PUBLIC_IP_ADDRESS* (Mine is 3.80.9.86) to test if apache works fine.
+#to install appache
 
-## Install Python 3 requirements
-Logged as grader:
- ```sh
-$ sudo apt-get install python3-pip
-$ sudo python3 -m pip install --upgrade pip
-$ pip3 install <PYTHON PACKAGES> flask - sqlalchemy - psycopg2
+$ sudo apt-get install python-setuptools libapache2-mod-wsgi
+#to install Install mod_wsgi
+
+$ sudo service apache2 restart
+#to restart apache
 ```
-The necessary python packages for this project are flask, sqlalchemy and psycopg2. The last one have some problems because dependencies. To solve this:
- ```sh
-$ sudo apt-get install libpq-dev python3-dev 
-$ pip3 install psycopg2
+
+### Setup PostgreSQL
 ```
-## Install and Config POSTGRESQL
-Logged as grader:
-```sh
 $ sudo apt-get install postgresql
+#to install postgresql
+
+$ sudo nano /etc/postgresql/9.3/main/pg_hba.conf
+#to check if no remote connections are allowed
+
 $ sudo su - postgres
-(postgres)$ psql
-postgres=# CREATE DATABASE grader;
-postgres=# CREATE USER grader;
-postgres=# ALTER ROLE grader WITH PASSWORD 'password';
-postgres=# GRANT ALL PRIVILEGES ON DATABASE grader TO grader;
+#to login as postgres
+```
+
+- as postgree get into postgreSQL shell with ```psql``` in there do:
+
+1. Create a new database named (in my case **brandsstore**) and a user named **catalog**
+```
+postgres=# CREATE DATABASE brandsstore;
+```
+
+2. Create a new user named catalog
+```
+postgres=# CREATE USER catalog;
+```
+
+3. Set a password for user catalog
+```
+postgres=# ALTER ROLE catalog WITH PASSWORD 'passwd123';
+```
+_I've also paste the passwd123 on the "Notes to Reviewer" field._
+
+4. Give user "catalog" permission to "catalog" application database
+```
+postgres=# GRANT ALL PRIVILEGES ON DATABASE brandsstore TO catalog;
+```
+
+5. Quit postgreSQL
+```
 postgres=# \q
-(postgres)$ logout
 ```
-Now, your have a *grader* database and a *grader* user tiwh all privileges on this database.
 
-## Clone your Flask App
-Logged as grader:
-```sh
+Exit from user "postgres"
+```
+exit
+```
+
+### Install git to clone Catalog app project.
+
+```shell
 $ sudo apt-get install git
-$ cd /var/www
-$ sudo mkdir FlaskApp
-$ cd FlaskApp
-$ git clone https://github.com/lboortigoza/restaurant_python3_udacity-proj-3.git
-$ sudo mv ./restaurant_python3_udacity ./FlaskApp
-$ cd FlaskApp
-$ sudo nano config.py
-```
-Change DATABASE_URL to 'postgresql://grader:password@localhost/grader'
-```sh
-$ sudo nano app.py
-```
-Remove *threaded=False* in line 138.
 
-## Create your Apache configuration file
-Logged as grader:
-```sh
+$ cd /var/www
+
+$ sudo mkdir ItemCatalog
+
+$ cd ItemCatalog/
+
+$ sudo git init
+# Initiate an empty git repository in the current folder
+
+$ sudo git remote add origin https://github.com/lboortigoza/catalog_python3_udacity-proj-4.git
+# Add my project as a remote repository
+
+$ sudo git remote -v
+# Check if the remote repository was added successfully
+
+$ sudo git pull origin master
+# Pull the remote repository
+
+$ ls
+# Check if the files were downloaded successfully
+
+$ cd catalog_python3_udacity-proj-4/
+```
+
+### Configure the Catalog app
+
+1. Rename ```project-1.py``` to```__init__.py```
+``` shell
+$ sudo mv project-1.py __init__.py
+```
+2. Edit database_setup.py, lotsofmenus.py, and the now renamed __init.py__, and change all occurrences of 'sqlite:///brandsstore.db' to 'postgresql://catalog:passwd123@localhost/brandsstore', editing the files with: sudo nano 'FILE-NAME'
+
+```python
+# engine = create_engine('sqlite:///brandsstore.db')
+#to
+create_engine('postgresql://catalog:passwd123@localhost/brandsstore')
+```
+at
+
+```shell
+$ sudo nano __init__.py
+$ sudo nano db_config.py
+```
+3. Install pip
+
+```shell
+$ sudo apt-get install python-pip
+$ sudo pip install -r requirements.txt
+```
+- Then, use it to install all dependencies listed on requirements.txt
+```
+$ sudo pip install -r requirements.txt
+
+```
+
+5. Create database schema
+```
+$ sudo python database_setup.py
+```
+
+6. To fill the database
+```
+$ sudo python lotsofmenus.py
+```
+
+6. Configure Apache and Enable a New Virtual Host
+Create FlaskApp.conf to edit:
+```
 $ sudo nano /etc/apache2/sites-available/FlaskApp.conf
 ```
-Copy and past the following configurations:
-```sh
+Add the following lines of code to the file to configure the virtual host.
+```
 <VirtualHost *:80>
-        ServerName 54.160.19.10
-        ServerAdmin leandrocl2005@yahoo.com
-        ServerAlias 54.160.19.10.xip.io
-	WSGIScriptAlias / /var/www/FlaskApp/flaskapp.wsgi
-	<Directory /var/www/FlaskApp/FlaskApp/>
+        ServerName 3.80.9.86
+        ServerAdmin leonardo.b.ortigoza@gmail.com
+        ServerAlias 3.80.9.86.xip.io
+	WSGIScriptAlias / /var/www/FlaskApp/itemcatalog.wsgi
+	<Directory /var/www/FlaskApp>
 		Order allow,deny
 		Allow from all
 	</Directory>
-	Alias /static /var/www/FlaskApp/FlaskApp/static
-	<Directory /var/www/FlaskApp/FlaskApp/static/>
+	Alias /static /var/www/FlaskApp/static
+	<Directory /var/www/FlaskApp/static/>
 		Order allow,deny
 		Allow from all
 	</Directory>
@@ -182,35 +260,40 @@ Copy and past the following configurations:
 	CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
 ```
-## Create wsgi configuration file
-Logged as grader:
-```sh
-$ cd /var/www/FlaskApp
-$ sudo nano flaskapp.wsgi 
+
+Enable the virtual host with the following command:
 ```
-Copy and past the following code:
-```sh
-#!/usr/bin/python3
+$ sudo a2ensite FlaskApp
+```
+
+Activate the new configuration
+```
+$ sudo service apache2 reload
+```
+
+7. Create and config the *.wsgi file
+
+To create AND edit the desired file:
+```
+$ sudo nano /var/www/FlaskApp/flaskapp.wsgi
+```
+
+add the following code to flaskapp.wsgi
+```
+#!/usr/bin/python
 import sys
 import logging
 
 logging.basicConfig(stream=sys.stderr)
-sys.path.insert(0,"/var/www/FlaskApp/FlaskApp")
+sys.path.insert(0,"/var/www/FlaskApp")
 
-from app import app as application
-application.secret_key = 'super secret key'
-```
-Restart and reload Apache:
-```sh
-$ sudo service apache2 restart
-$ sudo service apache2 reload
+from __init__ import app as application
+application.secret_key = 'super_secret_key'
 ```
 
-## Test your flask app
-Enter in your navigator with *YOUR_PUBLIC_IP_ADDRESS.xip.io* (Mine is 54.160.19.10.xip.io) to test if apache works fine. If something works bad, logged as user you can check the apache error.log file:
-```sh
-sudo tail -f /var/log/apache2/error.log 
-```
+# Logging
+If something breaks or go wrong, you can access a log for this application with the following command:
 
-# Thanks
-- To kongling893 for his excelent step by step guide: https://github.com/kongling893/Linux-Server-Configuration-UDACITY/blob/master/README.md
+```
+sudo tail -f /var/log/apache2/error.log
+```
