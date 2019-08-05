@@ -320,3 +320,12 @@ If something breaks or go wrong, you can access a log for this application with 
 ```
 sudo tail -f /var/log/apache2/error.log
 ```
+
+# References and inspiration
+### GitHub Repositories
+
+[@mguidoti](https://github.com/mguidoti/FSND-p8-linux_server_configuration)
+
+[@lucianobarauna](https://github.com/lucianobarauna/udacityproj_linuxserver)
+
+[@leandrocl2005](https://github.com/leandrocl2005/aws_lightsail_config_for_flask_python3)
