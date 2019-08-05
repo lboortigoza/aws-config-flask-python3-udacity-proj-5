@@ -76,7 +76,7 @@ $ sudo service ssh restart
 ```
  You can login with grader from your windows machine using gitbash now:
  ```sh
-$ ssh grader@3.80.9.86 -p 2200 -i ~/.ssh/grader-key-lbo
+$ ssh grader@3.93.33.208 -p 2200 -i ~/.ssh/grader-key-lbo
 ```
 Here 3.80.9.86 must be change to your Public IP. We change the usual ssh port to 2200.
 
