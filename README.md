@@ -83,7 +83,7 @@ Here 3.80.9.86 must be change to your Public IP. We change the usual ssh port to
 ## Disable root login
 Logged as grader:
  ```sh
-$ sudo vim /etc/ssh/sshd_config
+$ sudo nano /etc/ssh/sshd_config
 ```
 - Change *PermitRootLogin* to *no*
 - CTRL+X (exit nano), yes (save), enter (name file).
