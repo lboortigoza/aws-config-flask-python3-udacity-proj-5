@@ -93,6 +93,7 @@ Logged as grader:
  ```sh
 $ sudo apt-get update
 $ sudo apt-get upgrade
+$ sudo apt full-upgrade
 configure grub-pc -> keep the local version currently installed
 ```
 
